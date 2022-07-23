@@ -1,0 +1,139 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int            @id @default(autoincrement())
+  user_id       String         @default(uuid())
+  username      String
+  email         String?        @unique
+  title         Title          @default(MEMBER)
+  password      String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  role          Role           @relation(fields: [role_id], references: [id])
+  role_id       Int
+  profile       Profile?
+  group         Group          @relation(fields: [group_id], references: [id])
+  group_id      Int
+  contributions Contribution[]
+  disbursements Disbursement[]
+  messages      Message[]
+}
+
+enum Title {
+  CHAIRPERSON
+  SECRETARY
+  TREASURER
+  MEMBER
+}
+
+model Role {
+  id          Int                @id @default(autoincrement())
+  type        RoleType           @default(USER)
+  description String
+  users       User[]
+  permissions role_permissions[]
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+}
+
+model Permission {
+  id          Int                @id @default(autoincrement())
+  type        String
+  description String
+  roles       role_permissions[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum RoleType {
+  SUPER_ADMIN
+  ADMIN
+  USER
+}
+
+model role_permissions {
+  role          Role       @relation(fields: [role_id], references: [id])
+  role_id       Int
+  permission    Permission @relation(fields: [permission_id], references: [id])
+  permission_id Int
+  assignedAt    DateTime   @default(now())
+  assignedBy    String
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@id([role_id, permission_id])
+}
+
+model Profile {
+  id           Int      @id @default(autoincrement())
+  profile_id   String   @default(uuid())
+  first_name   String
+  second_name  String
+  phone_number String
+  id_number    String
+  user         User     @relation(fields: [user_id], references: [id])
+  user_id      Int      @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Group {
+  id                  Int            @id @default(autoincrement())
+  group_id            String         @default(uuid())
+  group_name          String
+  group_account_no    String
+  group_mpesa_paybill String
+  group_mpesa_account String
+  group_total_balance Int            @default(0)
+  users               User[]
+  contributions       Contribution[]
+  disbursements       Disbursement[]
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+}
+
+model Contribution {
+  id              Int      @id @default(autoincrement())
+  contribution_id String   @default(uuid())
+  amount          Int
+  user            User     @relation(fields: [user_id], references: [id])
+  user_id         Int
+  group           Group    @relation(fields: [group_id], references: [id])
+  group_id        Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Disbursement {
+  id              Int      @id @default(autoincrement())
+  disbursement_id String   @default(uuid())
+  amount          Int
+  user            User     @relation(fields: [user_id], references: [id])
+  user_id         Int
+  group           Group    @relation(fields: [group_id], references: [id])
+  group_id        Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Message {
+  id         Int      @id @default(autoincrement())
+  message_id String   @default(uuid())
+  message    String
+  created_by String
+  user       User     @relation(fields: [user_id], references: [id])
+  user_id    Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
