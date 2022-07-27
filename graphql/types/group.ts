@@ -1,6 +1,8 @@
 import {
   Contribution as ContributionType,
   Disbursement as DisbursementType,
+  Group as GroupType,
+  User as UserType,
 } from "@prisma/client";
 import { enumType, extendType, intArg, objectType } from "nexus";
 import { Contribution } from "./contribution";
@@ -46,14 +48,15 @@ export const Group = objectType({
           .contributions();
       },
     });
-    t.int("total_contributions");
-    t.int("total_disbursements");
-    t.int("total_users");
+    t.int("total_contribution");
+    t.int("total_disbursement");
+    t.int("contribution_percentage_increase");
+    t.int("disbursement_percentage_increase");
+    t.int("total_user");
     t.list.field("disbursement", {
       type: Disbursement,
       //@ts-ignore
       async resolve(_parent, _args, ctx) {
-        console.log(ctx);
         return await ctx.prisma.group
           .findUnique({
             where: {
@@ -108,14 +111,47 @@ export const groupInformation = extendType({
           0
         );
 
-        const group = await ctx.prisma.group.findUnique({
+        const group: GroupType | null = await ctx.prisma.group.findUnique({
           where: {
             //@ts-ignore
             id: 1,
           },
         });
 
-        const users = await ctx.prisma.group
+        const add_contribution_disbursement_to_group =
+          await ctx.prisma.group.update({
+            where: {
+              id: 1,
+            },
+            data: {
+              //@ts-ignore
+              total_contribution: total_contributions,
+              total_disbursement: total_disbursements,
+            },
+          });
+
+        function calculate_percentage_increase(
+          current_balance: number,
+          previous_balance: number
+        ) {
+          const deficit = current_balance - previous_balance;
+
+          const percentage_increase = (deficit / current_balance) * 100;
+
+          return Math.floor(percentage_increase);
+        }
+
+        const contribution_percentage_increase = calculate_percentage_increase(
+          add_contribution_disbursement_to_group.total_contribution,
+          add_contribution_disbursement_to_group.start_contribution_amount
+        );
+
+        const disbursement_percentage_increase = calculate_percentage_increase(
+          add_contribution_disbursement_to_group.total_disbursement,
+          add_contribution_disbursement_to_group.start_disbursement_amount
+        );
+
+        const users: UserType[] = await ctx.prisma.group
           .findUnique({
             where: {
               //@ts-ignore
@@ -125,11 +161,27 @@ export const groupInformation = extendType({
           .users();
 
         const total_users = users.length;
+
+        //save
+
+        await ctx.prisma.group.update({
+          where: {
+            id: 1,
+          },
+          data: {
+            total_user: total_users,
+            //@ts-ignore
+            start_contribution_amount:
+              add_contribution_disbursement_to_group.total_contribution,
+            start_disbursement_amount:
+              add_contribution_disbursement_to_group.total_disbursement,
+          },
+        });
+
         return {
           ...group,
-          total_contributions,
-          total_disbursements,
-          total_users,
+          contribution_percentage_increase,
+          disbursement_percentage_increase
         };
       },
     });

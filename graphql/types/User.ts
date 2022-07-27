@@ -36,7 +36,6 @@ export const User = objectType({
       type: Disbursement,
       //@ts-ignore
       async resolve(_parent, _args, ctx) {
-        console.log(ctx);
         return await ctx.prisma.user
           .findUnique({
             where: {

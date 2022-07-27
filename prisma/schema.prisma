@@ -89,18 +89,23 @@ model Profile {
 }
 
 model Group {
-  id                  Int            @id @default(autoincrement())
-  group_id            String         @default(uuid())
-  group_name          String
-  group_account_no    String
-  group_mpesa_paybill String
-  group_mpesa_account String
-  group_total_balance Int            @default(0)
-  users               User[]
-  contributions       Contribution[]
-  disbursements       Disbursement[]
-  createdAt           DateTime       @default(now())
-  updatedAt           DateTime       @updatedAt
+  id                        Int            @id @default(autoincrement())
+  group_id                  String         @default(uuid())
+  group_name                String
+  group_account_no          String
+  group_mpesa_paybill       String
+  group_mpesa_account       String
+  group_total_balance       Int            @default(0)
+  users                     User[]
+  contributions             Contribution[]
+  disbursements             Disbursement[]
+  total_contribution        Int            @default(0)
+  total_disbursement        Int            @default(0)
+  start_contribution_amount Int            @default(0)
+  start_disbursement_amount Int            @default(0)
+  total_user                Int            @default(0)
+  createdAt                 DateTime       @default(now())
+  updatedAt                 DateTime       @updatedAt
 }
 
 model Contribution {

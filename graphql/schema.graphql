@@ -24,8 +24,10 @@ type Disbursement {
 
 type Group {
   contribution: [Contribution]
+  contribution_percentage_increase: Int
   createdAt: String
   disbursement: [Disbursement]
+  disbursement_percentage_increase: Int
   group_account_no: Int
   group_id: String
   group_mpesa_account: String
@@ -33,9 +35,9 @@ type Group {
   group_name: String
   group_total_balance: String
   id: Int
-  total_contributions: Int
-  total_disbursements: Int
-  total_users: Int
+  total_contribution: Int
+  total_disbursement: Int
+  total_user: Int
   updatedAt: String
   users: [User]
 }
