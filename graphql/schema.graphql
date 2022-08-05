@@ -24,9 +24,11 @@ type Disbursement {
 
 type Group {
   contribution: [Contribution]
+  contribution_as_at: String
   contribution_percentage_increase: Int
   createdAt: String
   disbursement: [Disbursement]
+  disbursement_as_at: String
   disbursement_percentage_increase: Int
   group_account_no: Int
   group_id: String
@@ -39,6 +41,7 @@ type Group {
   total_disbursement: Int
   total_user: Int
   updatedAt: String
+  user_as_at: String
   users: [User]
 }
 
@@ -50,6 +53,11 @@ type Message {
   message_id: String
   updatedAt: String
   user_id: String
+}
+
+type Mutation {
+  createUser(email: String, password: String, profileInput: profileInput, role_id: Int, title: String, username: String): User
+  login(email: String!, password: String!): User
 }
 
 type Profile {
@@ -93,4 +101,11 @@ type User {
   updatedAt: String
   user_id: String
   username: String
+}
+
+input profileInput {
+  first_name: String!
+  id_number: String!
+  phone_number: String!
+  second_name: String!
 }

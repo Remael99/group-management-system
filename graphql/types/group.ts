@@ -18,6 +18,9 @@ export const Group = objectType({
     t.int("group_account_no");
     t.string("group_mpesa_paybill");
     t.string("group_mpesa_account");
+    t.string("contribution_as_at");
+    t.string("disbursement_as_at");
+    t.string("user_as_at");
     t.string("group_total_balance");
     t.list.field("users", {
       type: User,
@@ -130,25 +133,39 @@ export const groupInformation = extendType({
             },
           });
 
+        const last_contribution_createdat =
+          await ctx.prisma.contribution.findMany();
+        const last_disbursement_createdat =
+          await ctx.prisma.disbursement.findMany();
+
+        const contribution_as_at =
+          last_contribution_createdat[last_contribution_createdat.length - 1]
+            .createdAt;
+
+        const disbursement_as_at =
+          last_disbursement_createdat[last_disbursement_createdat.length - 1]
+            .createdAt;
+
         function calculate_percentage_increase(
           current_balance: number,
           previous_balance: number
         ) {
-          const deficit = current_balance - previous_balance;
-
-          const percentage_increase = (deficit / current_balance) * 100;
+          const percentage_increase =
+            (previous_balance / current_balance) * 100;
 
           return Math.floor(percentage_increase);
         }
 
         const contribution_percentage_increase = calculate_percentage_increase(
           add_contribution_disbursement_to_group.total_contribution,
-          add_contribution_disbursement_to_group.start_contribution_amount
+          last_contribution_createdat[last_contribution_createdat.length - 1]
+            .amount
         );
 
         const disbursement_percentage_increase = calculate_percentage_increase(
           add_contribution_disbursement_to_group.total_disbursement,
-          add_contribution_disbursement_to_group.start_disbursement_amount
+          last_disbursement_createdat[last_disbursement_createdat.length - 1]
+            .amount
         );
 
         const users: UserType[] = await ctx.prisma.group
@@ -181,7 +198,9 @@ export const groupInformation = extendType({
         return {
           ...group,
           contribution_percentage_increase,
-          disbursement_percentage_increase
+          disbursement_percentage_increase,
+          contribution_as_at,
+          disbursement_as_at,
         };
       },
     });

@@ -5,8 +5,13 @@
 
 @layer base {
    body {
-    @apply bg-[#fafafa]
+    @apply bg-slate-100 bg-opacity-80
    }
 
    
 }
+
+
+/* body{
+   background-color:#f8f8f8;
+} */

@@ -28,7 +28,7 @@ const GET_USER = gql`
         }
         disbursement {
           id
-          Disbursement_id
+          disbursement_id
           amount
           createdAt
         }
@@ -54,7 +54,7 @@ export default function Profile() {
           <title>Maendelo Chama | Profile</title>
           <link rel="icon" href="/favicon.ico" />
         </Head>
-        <div className="bg-white shadow overflow-hidden sm:rounded-lg w-full md:w-[90%] lg:w-3/4  ">
+        <div className="bg-white shadow overflow-hidden sm:rounded-md w-full md:w-[90%] lg:w-3/4  ">
           <div className="px-4 py-5 sm:px-6">
             <h3 className="text-lg leading-6 font-medium text-gray-900">
               loading....

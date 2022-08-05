@@ -4,3 +4,4 @@ export * from "./User";
 export * from "./group";
 export * from "./message";
 export * from "./profile";
+export * from "./auth";
